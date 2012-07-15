@@ -1,0 +1,303 @@
+\ProvidesPackage{base/cwpack}
+\renewcommand{\vec}{\overline}
+\newenvironment{defonlypic}{%
+\begin{center}
+    \begin{tikzpicture}[
+        scale=1.2,
+    >=latex,
+    axis/.style={->,gray,thick},
+    body/.style={ultra thick},
+    accel/.style={->,ultra thick,red},
+    speed/.style={->,ultra thick,green!70!black},
+    force/.style={->,ultra thick,blue},
+    naforce/.style={ultra thick,blue},
+    react/.style={->,ultra thick,red!50!blue},
+    sizen/.style={gray},
+    base/.style={
+        gray,
+        thick,
+        postaction={draw,decorate,decoration={border, 
+                                    angle=-45, amplitude=0.3cm,
+                                    segment length=0.2cm}
+                   }
+    },
+    br/.style={decorate,decoration={brace,mirror,amplitude=10pt,raise=3pt}},
+    spring/.style={decorate, decoration={zigzag, amplitude=0.2cm,
+                                            pre=curveto,pre length=0.2cm, 
+                                            post=curveto, post length=0.2cm}},
+    ]
+}{
+\end{tikzpicture}
+\end{center}
+}
+\newenvironment{bspic}{%
+\begin{defonlypic}
+        \calccoords;
+}{
+\end{defonlypic}
+}
+\newenvironment{mypic}{%
+\begin{bspic}
+    \crdaxis;
+}{
+\end{bspic}
+}
+\renewcommand{\phi}{\varphi}
+\def\mt{\mathcal}
+\newcommand{\vdf}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\df}[2]{\frac{\delta #1}{\delta #2}}
+\newcommand{\mvec}[2]{\vec{\mathcal{#1}}_{\textrm{$#2$}}}
+\newcommand{\speed}[1]{\mvec{V}{#1}}
+\newcommand{\accel}[1]{\mvec{W}{#1}}
+\newcommand{\force}[1]{\mvec{F}{#1}}
+\newcommand{\iforce}[1]{\vec{\Phi}_{#1}}
+\newcommand{\react}[1]{\mvec{R}{#1}}
+\newcommand{\reactN}[1]{\mvec{N}{#1}}
+\newcommand{\mg}[1]{m_#1\vec{g}}
+\newcommand{\dpdt}{\frac{d}{dt}}
+\def\cpdps{(\dot\phi^2\cdot\cos{\phi} + \ddot\phi\cdot\sin{\phi})}
+\def\cmspd{(\ddot\phi\cdot\cos{\phi} - \dot\phi^2\cdot\sin{\phi})}
+\def\half{\frac{1}{2}}
+\def\veps{\LARGE\mathcal\varepsilon}
+\def\Ae{A^{(e)}}
+\def\Ai{A^{(i)}}
+
+\def\point{circle (2pt)}
+\def\pblock{++(-0.5, -0.75) rectangle +(1,1.5)}
+
+% main task defenitions 
+\def\angs{35} % phi angle
+\def\revangs{180-\angs}
+\def\lenAB{8} % 4's object len
+\def\crad{2} % cylinder 1 radius
+\def\SS{2} % S size
+
+% draw const defs
+\def\anglr{1.5} % angle arrow radius
+\def\YaxisH{9.5}
+
+\def\crdaxis{%
+    \draw[axis,<->] (0,\YaxisH) node (Y) [above] {$Y$}%
+            |- (10, 0) node (X) [right] {$X$};
+    \fill (0,0) \point node (O) [left] {$O$};
+    \draw[base] +(0.8,0)--(X);
+}
+
+% calc all points
+\def\calccoords{%
+    \coordinate (A) at ({cos(\angs)*\lenAB}, 3);
+    \coordinate (Ah) at ($(A)+(0:1)$);
+    \coordinate (Av) at ($(A)+(90:1)$);
+    \coordinate (K) at ($(A)+(0,-\crad)$);
+    \coordinate (B) at (intersection of A--[shift={(180-\angs:1)}]A and 0,0--0,1);
+    \coordinate (Bh) at ($(B)+(0:1)$);
+    \coordinate (Ls) at (9,0);
+    \coordinate (Le) at ($(Ls)+(90:1)$);
+    \coordinate (C) at (0,\SS);
+}
+
+\def\drawfigone{%
+    % cylinder
+    \draw[body] (A) circle (\crad);
+    \fill (A) \point node[above right] {$A$};
+    \node at ($(A)+(-30:1.2)$) {$1$};
+    % radius vector
+    \def\radlabelang{-130};
+    \draw[->,sizen] (A) -- +(\radlabelang:\crad);
+    \node[above left] at ($(A)+(\radlabelang:{\crad*0.75})$) {$R$};
+    % base
+    \fill (K) \point node[above right] {$K$};
+    \def\bwidth{1.5};
+    \draw[base] (K) +(-\bwidth,0) -- +(\bwidth,0);
+}
+
+\def\drawfigonela{%
+    \draw[sizen] (A)--($(intersection of A--Ah and Ls--Le)+(lspt)$);
+    \draw[<->,sizen] ($(Ls)!(A)!(Le)$)--($(Ls)!(O)!(Le)$);
+    \node[right] at ($(intersection of A--Ah and Ls--Le)+(90:-1)$) {$l_1$};
+}
+
+\def\drawfigoneWE{%
+    \def\epsrad{\crad+0.15};
+    \def\epsstr{20}
+    \def\epslen{30}
+    \def\epsrln{\epsstr+\epslen}
+    \draw[accel] (A)+(\epsstr:\epsrad) arc (\epsstr:\epsrln:\epsrad) node[above right] {$\veps_A$};
+    \draw[speed] (A)+(\epsrln:\epsrad) arc (\epsrln:{\epsrln+\epslen}:\epsrad) node[above right] {$\omega_A$};
+}
+
+\def\drawfigoneME{%
+    \def\epsrad{\crad+0.15};
+    \def\epsstr{45}
+    \def\epslen{30}
+    \draw[accel] (A)+(-\epsstr:\epsrad) arc (-\epsstr:{-\epsstr+\epslen}:\epsrad) node[below right] {$\veps_A$};
+    \draw[force] (A)+( \epsstr:\epsrad) arc ( \epsstr:{ \epsstr-\epslen}:\epsrad) node[above right] {$\mt{M}_A^{\Phi}$};
+}
+
+\def\drawfigoneSA{%
+    \drawfigoneWE;
+
+    \draw[accel] (A)++(-1.45,0)--+(-1.55,0) node[above] {$\accel{A}$};
+    \draw[speed] (A)--+(-1.5,0) node[above] {$\speed{A}$};
+}
+
+\def\drawfigonereactions{%
+    \draw[react] (K) -- +(1.5, 0) node[right] {$\reactN{x}$};
+    \draw[react] (K) -- +(0, 1.5) node[below right] {$\reactN{y}$};
+}
+
+\def\drawfigoneftask{%
+    \drawfigone;
+    \drawfigoneWE;
+    \draw[body] (A) -- +(\revangs:5);
+    \draw[force] (A) -- +(\revangs:1.5) node[above right] {$\force{}$};
+    \draw[force] (A) -- +(0,-2.75) node[left] {$m_1\vec{g}$};
+    \draw[react] (K) -- +(0,1.5) node[right] {$\mvec{N}{}$};
+    \draw[react] (K) -- +(2,0) node[above] {$\force{тр}$};
+}
+
+\def\drawfigtwo{%
+    \fill (B) \point node[left] {$B$};
+    \node[above right] at (B) {$2$};
+    \draw[body] (B) \pblock;
+    \draw[base] (-.7,{\YaxisH-0.8}) -- (-.7,0);
+    \draw[base] ( .7,0) -- ( .7,{\YaxisH-0.8});
+    \draw[axis] (B) -- +(5,0) node[above] {$\eta$};
+    \draw[axis] (B) -- (0,-.5) node[right] {$\xi$};
+}
+
+\def\drawfigtwoRAF{%
+    \draw[accel] (B)++(0,0.95) -- +(0, .5) node[left] {$\accel{B}$};
+    \draw[react] (B) -- +(2, 0) node[above] {$\react{X}$};
+    \draw[react] (B) -- +(0, 1) node[right] {$\react{Y}$};
+    \draw[force] (B) -- +(0, -1) node[left] {$m_2\vec{g}$};
+    \draw[force] (B) -- +(0, -2) node[right] {$\force{упр}$};
+}
+
+
+\def\drawfigthreeSA{%
+    \draw[accel] (C)++(0,1.45)--+(0,1.55) node[right] {$\accel{абс_C}$};
+    \draw[speed] (C)--+(0,1.5) node[right] {$\speed{абс_C}$};
+}
+\def\drawfigfourLoy{%
+    \draw[sizen] (A)--($(intersection of A--Ah and Ls--Le)+(lspt)$);
+    \draw[sizen] (B)--($(intersection of B--Bh and Ls--Le)+(lspt)$);
+    \draw[<->,sizen] ($(Ls)!(A)!(Le)$)--($(Ls)!(B)!(Le)$);
+    \node[right] at ($(intersection of A--Ah and Ls--Le)+(90:3)$) {$L\sin{\phi}$};
+}
+
+\def\drawfigthree{%
+    \draw[body] (C) \pblock;
+    \fill (C) \point node[above left] {$C$};
+    \node[below left] at (C) {$3$};
+    \def\sadst{1.5};
+    \draw[sizen] (C) -- +({\sadst+0.2},0);
+    \draw[->,sizen] (\sadst,0)--+(0,\SS);
+    \node[right] at (\sadst,{\SS/2}) {$S$};
+}
+
+\def\drawfigthreeMGA{%
+    \draw[force] (C)--+(0,-1.05) node[left] {$m_3\vec g$};
+    \draw[accel] (C)++(0,-1.0)--+(0,-1.0) node[above left] {$\accel{отн}$};
+}
+
+\def\drawfigfour{%
+    \draw[body] (A)--(B);
+    \draw[sizen,decorate,decoration={brace,mirror,amplitude=10pt,raise=3pt}] (A)--(B);
+    \node at ($(A)!0.5!(B)+(0.3,0.5)$) {$L$};
+    \node[below left] at ($(A)+({180-\angs}:3)$) {$4$};
+    \draw[sizen,<->] (B)+(0:\anglr) arc (0:-\angs:\anglr);
+    \node at ($(B)+({-\angs/2}:{\anglr+0.25})$) {$\phi$};
+    \coordinate (momentnode) at ($(A)+(180-\angs:5)$);
+    \draw[force] (momentnode) arc ({180-\angs}:{180-\angs-45}:1);
+    \draw[naforce] (momentnode) arc ({180-\angs}:{180-\angs+45}:1);
+    \node[above,force] at ($(momentnode)+(0,0.2)$) {$M$};
+}
+
+\def\drawfigfive{%
+    \draw[spring,body] (B)--(C);
+    \node[left] at ($(B)!.5!(C)+(-0.2,0)$) {$5$};
+}
+
+\def\drawfirstpart{%
+    \drawfigone;
+    \drawfigfour;
+    \drawfigtwo;
+    \coordinate (lspt) at (0.25,0); % Lsin(\phi) tab
+}
+
+\def\drawsecondpart{%
+    \drawfigtwo;
+    \drawfigthree;
+    \drawfigfive;
+}
+
+\def\drawallfigs{%
+    \drawfirstpart;
+    \drawfigthree;
+    \drawfigfive;
+}
+
+\def\drawinnertionforces{%
+    \draw[force] (A) -- +(1.5,0) node[above] {$\iforce{1}$};
+    \draw[force] (B) -- +(0, -1.5) node[right] {$\iforce{2}$};
+    \draw[force] (C) -- +(0, -1.5) node[right] {$\iforce{3}$};
+}
+
+\def\drawallaccels{%
+    \draw[accel] (A) -- +(-1.5,0) node[above] {$\accel{A}$};
+    \draw[accel] (B) -- +(0, 1.5) node[right] {$\accel{B}$};
+    \draw[accel] (C) -- +(0, 1.5) node[right] {$\accel{C}$};
+}
+
+\def\drawallmg{%
+    \draw[force] (A) -- +(0, -2.7) node[right] {$\mg{1}$};
+    \draw[force] (B) -- +(0, -2.7) node[right] {$\mg{2}$};
+    \draw[force] (C) -- +(0, -2.7) node[right] {$\mg{3}$};
+}
+
+\def\drawallspeeds{%
+    \draw[speed] (A) -- +(-1.5, 0) node[above] {$\speed{A}$};
+    \draw[speed] (B) -- +(0, 1.5) node[right] {$\speed{B}$};
+    \draw[speed] (C) -- +(0, 1.5) node[left] {$\speed{C}$};
+    }
+
+\def\drawghostpart{%
+    \coordinate (Agp) at (\lenAB, 3);
+    \coordinate (Bgp) at (0,3);
+    \draw[body, dashed] (Agp) circle (\crad);
+    \draw[body, dashed] (Agp) -- (Bgp);
+    \draw[body, dashed] (Bgp) \pblock;
+}
+
+\def\drawallforfivetask{%
+    \renewcommand\SS{0};
+    \renewcommand\angs{20};
+    \renewcommand\YaxisH{8};
+    \calccoords;
+    \crdaxis;
+    \drawfirstpart;
+    \drawghostpart;
+    \drawfigoneWE;
+    \draw[force] (B) -- +(0, -1) node[right] {$\mg{2}$};
+    \draw[speed] (B) -- +(0, 1.8) node[right] {$\speed{B}$};
+    \draw[speed] (A) -- +(-1.5, 0) node[below] {$\speed{A}$};
+    \def\htspace{1.5}
+    \draw[sizen] (Bgp) -- +({-\htspace-0.25},0);
+    \draw[sizen] (B) -- +({-\htspace-0.25},0);
+    \coordinate (Bgpsp) at ($(Bgp)+(-\htspace,0)$);
+    \coordinate (Bsp) at ($(B)+(-\htspace,0)$);
+    \draw[sizen,<->] (Bsp) -- (Bgpsp);
+    \node[left] at ($(Bgpsp)!.5!(Bsp)$) {$h_2$};
+    \draw[sizen] (Bgp) -- (A);
+    \coordinate (abc) at ($(A)!.5!(B)$);
+    \fill (abc) \point;
+    \draw[force] (abc) -- +(0,-2) node (abcf) [below] {$\mg{4}$};
+    \draw[sizen, br] (abc) -- (intersection of abc--abcf and Bgp--A) node (abcfica) {};
+    \node[left] at ($(abc)!.5!(abcfica)+(-.3,0)$) {$h_4$};
+    \coordinate (D) at ($(intersection of A--Av and B--Bh)$);
+    \fill (D) \point node[right] {$D - м.ц.с.$};
+    \draw[sizen] (D) -- (A) |- (B);
+    \draw[sizen] (D) -- (abc);
+    \draw[speed] (abc)-- +({90+\angs}:1) node[right] {$\speed{4}$};
+}

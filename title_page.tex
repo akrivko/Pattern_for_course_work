@@ -1,0 +1,45 @@
+\begin{titlepage}
+\newpage
+
+\begin{center}
+Московский Авиационный Институт\\
+(Государственный Технический Университет)
+\end{center}
+
+\vspace{2em}
+
+\center{\includegraphics[width=4cm]{mai.eps}}
+
+\vspace{2em}
+
+\begin{center}
+\Large Название кафедры \\ 
+\end{center}
+
+\vspace{2em}
+
+\begin{center}
+\textsc{\textbf{Название темы работы \linebreak длинное очень, набранное в \LaTeX{}}}
+\end{center}
+
+\vspace{6em}
+
+\newbox{\lbox}
+\savebox{\lbox}{\hbox{Пупкин Иван Иванович}}
+\newlength{\maxl}
+\setlength{\maxl}{\wd\lbox}
+\hfill\parbox{11cm}{
+\hspace*{5cm}\hspace*{-5cm}Студент:\hfill\hbox to\maxl{Тест Пользователь\hfill}\\
+\hspace*{5cm}\hspace*{-5cm}Группа:\hfill\hbox to\maxl{NNN}\\
+\\
+\hspace*{5cm}\hspace*{-5cm}Преподаватель:\hfill\hbox to\maxl{Пупкин Иван Иванович}\\
+}
+
+\vspace{\fill}
+
+\begin{center}
+Москва \\
+2012
+\end{center}
+
+\end{titlepage}
